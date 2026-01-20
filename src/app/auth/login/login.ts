@@ -43,6 +43,7 @@ export class Login {
           
           // Il backend ritorna il messaggio direttamente in error.error.message
           this.errorMessage = error?.error?.message || error?.message || 'Errore durante il login. Verifica le credenziali.';
+          console.log('errorMessage impostato a:', this.errorMessage);
           this.loading = false;
         },
         complete: () => {
