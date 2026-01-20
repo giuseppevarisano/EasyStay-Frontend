@@ -1,0 +1,114 @@
+<div class="register-container">
+  <div class="register-card">
+    <h1>EasyStay</h1>
+    <h2>Registrati</h2>
+    
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input 
+          type="text" 
+          id="username" 
+          formControlName="username"
+          [class.invalid]="username?.invalid && username?.touched"
+          placeholder="Scegli un username"
+        />
+        @if (username?.invalid && username?.touched) {
+          <span class="error-message">
+            @if (username?.hasError('required')) {
+              Username obbligatorio
+            } @else if (username?.hasError('minlength')) {
+              L'username deve contenere almeno 3 caratteri
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          formControlName="email"
+          [class.invalid]="email?.invalid && email?.touched"
+          placeholder="Inserisci la tua email"
+        />
+        @if (email?.invalid && email?.touched) {
+          <span class="error-message">
+            @if (email?.hasError('required')) {
+              Email obbligatoria
+            } @else if (email?.hasError('email')) {
+              Email non valida
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          [class.invalid]="password?.invalid && password?.touched"
+          placeholder="Crea una password"
+        />
+        @if (password?.invalid && password?.touched) {
+          <span class="error-message">
+            @if (password?.hasError('required')) {
+              Password obbligatoria
+            } @else if (password?.hasError('minlength')) {
+              La password deve contenere almeno 6 caratteri
+            }
+          </span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword">Conferma Password</label>
+        <input 
+          type="password" 
+          id="confirmPassword" 
+          formControlName="confirmPassword"
+          [class.invalid]="(confirmPassword?.invalid || registerForm.hasError('passwordMismatch')) && confirmPassword?.touched"
+          placeholder="Conferma la password"
+        />
+        @if (confirmPassword?.touched) {
+          @if (confirmPassword?.hasError('required')) {
+            <span class="error-message">Conferma password obbligatoria</span>
+          } @else if (registerForm.hasError('passwordMismatch')) {
+            <span class="error-message">Le password non coincidono</span>
+          }
+        }
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (successMessage) {
+        <div class="alert alert-success">
+          {{ successMessage }}
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        [disabled]="registerForm.invalid || loading"
+        class="btn-primary"
+      >
+        @if (loading) {
+          Registrazione in corso...
+        } @else {
+          Registrati
+        }
+      </button>
+
+      <div class="login-link">
+        Hai già un account? <a routerLink="/auth/login">Accedi</a>
+      </div>
+    </form>
+  </div>
+</div>
