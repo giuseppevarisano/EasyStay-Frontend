@@ -38,7 +38,15 @@ export class Login {
           this.router.navigate([returnUrl]);
         },
         error: (error) => {
-          this.errorMessage = error.error?.message || 'Errore durante il login. Verifica le credenziali.';
+          console.error('Login error:', error);
+          console.error('Error structure:', JSON.stringify(error, null, 2));
+          
+          // Il backend ritorna il messaggio direttamente in error.error.message
+          this.errorMessage = error?.error?.message || error?.message || 'Errore durante il login. Verifica le credenziali.';
+          this.loading = false;
+        },
+        complete: () => {
+          // Assicuriamoci che loading venga sempre resettato
           this.loading = false;
         }
       });
