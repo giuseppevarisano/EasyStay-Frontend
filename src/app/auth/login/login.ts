@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute, RouterLink } from '@angular/router';
@@ -15,6 +15,7 @@ export class Login {
   private authService = inject(AuthService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
 
   loginForm: FormGroup;
   loading = false;
@@ -45,6 +46,7 @@ export class Login {
           this.errorMessage = error?.error?.message || error?.message || 'Errore durante il login. Verifica le credenziali.';
           console.log('errorMessage impostato a:', this.errorMessage);
           this.loading = false;
+          this.cdr.detectChanges(); // Forza il change detection
         },
         complete: () => {
           // Assicuriamoci che loading venga sempre resettato
