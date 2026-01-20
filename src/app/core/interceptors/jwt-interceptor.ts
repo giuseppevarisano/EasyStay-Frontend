@@ -20,8 +20,11 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      // Se riceve 401 Unauthorized, effettua il logout
-      if (error.status === 401) {
+      // Non gestire 401 sulle rotte di autenticazione (login/register)
+      const isAuthRoute = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+      
+      // Se riceve 401 Unauthorized su rotte protette, effettua il logout
+      if (error.status === 401 && !isAuthRoute) {
         authService.logout();
         router.navigate(['/auth/login']);
       }
