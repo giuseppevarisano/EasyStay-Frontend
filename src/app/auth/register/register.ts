@@ -22,10 +22,11 @@ export class Register {
 
   constructor() {
     this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      nome: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]]
+      confirmPassword: ['', [Validators.required]],
+      ruolo: ['USER', [Validators.required]]
     }, {
       validators: this.passwordMatchValidator
     });
@@ -49,8 +50,15 @@ export class Register {
       this.successMessage = '';
 
       const { confirmPassword, ...registerData } = this.registerForm.value;
+      // Assicuriamoci che i dati siano nel formato corretto per RegisterRequestDTO
+      const requestData = {
+        email: registerData.email,
+        password: registerData.password,
+        nome: registerData.nome,
+        ruolo: registerData.ruolo
+      };
 
-      this.authService.register(registerData).subscribe({
+      this.authService.register(requestData).subscribe({
         next: () => {
           this.successMessage = 'Registrazione completata con successo! Reindirizzamento...';
           setTimeout(() => {
@@ -65,8 +73,8 @@ export class Register {
     }
   }
 
-  get username() {
-    return this.registerForm.get('username');
+  get nome() {
+    return this.registerForm.get('nome');
   }
 
   get email() {
@@ -79,5 +87,9 @@ export class Register {
 
   get confirmPassword() {
     return this.registerForm.get('confirmPassword');
+  }
+
+  get ruolo() {
+    return this.registerForm.get('ruolo');
   }
 }

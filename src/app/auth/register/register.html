@@ -5,20 +5,20 @@
     
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="nome">Nome</label>
         <input 
           type="text" 
-          id="username" 
-          formControlName="username"
-          [class.invalid]="username?.invalid && username?.touched"
-          placeholder="Scegli un username"
+          id="nome" 
+          formControlName="nome"
+          [class.invalid]="nome?.invalid && nome?.touched"
+          placeholder="Inserisci il tuo nome"
         />
-        @if (username?.invalid && username?.touched) {
+        @if (nome?.invalid && nome?.touched) {
           <span class="error-message">
-            @if (username?.hasError('required')) {
-              Username obbligatorio
-            } @else if (username?.hasError('minlength')) {
-              L'username deve contenere almeno 3 caratteri
+            @if (nome?.hasError('required')) {
+              Nome obbligatorio
+            } @else if (nome?.hasError('minlength')) {
+              Il nome deve contenere almeno 2 caratteri
             }
           </span>
         }
@@ -79,6 +79,21 @@
           } @else if (registerForm.hasError('passwordMismatch')) {
             <span class="error-message">Le password non coincidono</span>
           }
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="ruolo">Ruolo</label>
+        <select 
+          id="ruolo" 
+          formControlName="ruolo"
+          [class.invalid]="ruolo?.invalid && ruolo?.touched"
+        >
+          <option value="USER">Utente</option>
+          <option value="ADMIN">Amministratore</option>
+        </select>
+        @if (ruolo?.invalid && ruolo?.touched) {
+          <span class="error-message">Ruolo obbligatorio</span>
         }
       </div>
 

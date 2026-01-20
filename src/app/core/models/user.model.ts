@@ -1,24 +1,31 @@
 export interface User {
-  id?: number;
-  username: string;
   email: string;
-  role?: string;
+  nome: string;
+  ruolo: string;
 }
 
+// AuthenticationRequestDTO
 export interface LoginRequest {
-  username: string;
-  password: string;
-}
-
-export interface RegisterRequest {
-  username: string;
   email: string;
   password: string;
-  confirmPassword?: string;
 }
 
-export interface AuthResponse {
+// AuthenticationResponseDTO
+export interface LoginResponse {
   token: string;
-  type?: string;
-  user: User;
+}
+
+// RegisterRequestDTO
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  nome: string;
+  ruolo: string;
+}
+
+// RegisterResponseDTO
+export interface RegisterResponse {
+  token: string;
+  email: string;
+  nome: string;
 }

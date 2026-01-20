@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User, LoginRequest, RegisterRequest, AuthResponse } from '../models/user.model';
+import { User, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root',
@@ -20,17 +20,17 @@ export class AuthService {
 
   constructor() {}
 
-  login(credentials: LoginRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/login`, credentials)
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
       .pipe(
-        tap(response => this.handleAuthResponse(response))
+        tap(response => this.handleLoginResponse(response))
       );
   }
 
-  register(userData: RegisterRequest): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${environment.apiUrl}/auth/register`, userData)
+  register(userData: RegisterRequest): Observable<RegisterResponse> {
+    return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, userData)
       .pipe(
-        tap(response => this.handleAuthResponse(response))
+        tap(response => this.handleRegisterResponse(response))
       );
   }
 
@@ -53,10 +53,20 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  private handleAuthResponse(response: AuthResponse): void {
+  private handleLoginResponse(response: LoginResponse): void {
     localStorage.setItem(this.TOKEN_KEY, response.token);
-    localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
-    this.currentUserSubject.next(response.user);
+    // Il login ritorna solo il token, non i dati utente
+  }
+
+  private handleRegisterResponse(response: RegisterResponse): void {
+    localStorage.setItem(this.TOKEN_KEY, response.token);
+    const user: User = {
+      email: response.email,
+      nome: response.nome,
+      ruolo: 'USER' // Default ruolo
+    };
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.currentUserSubject.next(user);
   }
 
   private getUserFromStorage(): User | null {

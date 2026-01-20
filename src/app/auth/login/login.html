@@ -5,16 +5,22 @@
     
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="username">Username</label>
+        <label for="email">Email</label>
         <input 
-          type="text" 
-          id="username" 
-          formControlName="username"
-          [class.invalid]="username?.invalid && username?.touched"
-          placeholder="Inserisci il tuo username"
+          type="email" 
+          id="email" 
+          formControlName="email"
+          [class.invalid]="email?.invalid && email?.touched"
+          placeholder="Inserisci la tua email"
         />
-        @if (username?.invalid && username?.touched) {
-          <span class="error-message">Username obbligatorio</span>
+        @if (email?.invalid && email?.touched) {
+          <span class="error-message">
+            @if (email?.hasError('required')) {
+              Email obbligatoria
+            } @else if (email?.hasError('email')) {
+              Inserisci un'email valida
+            }
+          </span>
         }
       </div>
 
