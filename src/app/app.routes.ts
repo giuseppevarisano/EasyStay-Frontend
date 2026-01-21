@@ -7,14 +7,13 @@ export const routes: Routes = [
     loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
   },
   {
-    path: '',
-    redirectTo: '/auth/login',
-    pathMatch: 'full'
+    path: 'properties',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/properties/property-list/property-list').then(m => m.PropertyList)
   },
-  // Esempio di rotta protetta
-  // {
-  //   path: 'dashboard',
-  //   canActivate: [authGuard],
-  //   loadComponent: () => import('./features/dashboard/dashboard').then(m => m.Dashboard)
-  // }
+  {
+    path: '',
+    redirectTo: '/properties',
+    pathMatch: 'full'
+  }
 ];

@@ -35,7 +35,7 @@ export class Login {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/properties';
           this.router.navigate([returnUrl]);
         },
         error: (error) => {
