@@ -1,19 +1,12 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth-guard';
+import { AuthGuard } from './guards/auth.guard';
+import { PropertySearchComponent } from './components/property-search/property-search.component';
+import { AuthComponent } from './components/auth/auth.component';
+import { PropertiesComponent } from './components/properties/properties.component';
 
-export const routes: Routes = [
-  {
-    path: 'auth',
-    loadChildren: () => import('./auth/auth-module').then(m => m.AuthModule)
-  },
-  {
-    path: 'properties',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/properties/property-list/property-list').then(m => m.PropertyList)
-  },
-  {
-    path: '',
-    redirectTo: '/auth/login',  // ← Cambia qui da '/properties' a '/auth/login'
-    pathMatch: 'full'
-  }
+export const appRoutes: Routes = [
+    { path: 'auth', component: AuthComponent },
+    { path: 'search', component: PropertySearchComponent, canActivate: [AuthGuard] },
+    { path: 'properties', component: PropertiesComponent },
+    { path: '', redirectTo: '/auth/login', pathMatch: 'full' }
 ];
