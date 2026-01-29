@@ -9,8 +9,13 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
 
-  // Clona la richiesta e aggiunge il token JWT se presente
-  if (token) {
+  // Verifica se è una rotta di autenticazione (login/register)
+  const isAuthRoute = req.url.includes('/auth/login') || req.url.includes('/auth/register');
+
+  // Clona la richiesta e aggiunge il token JWT SOLO se:
+  // 1. Il token esiste
+  // 2. NON è una rotta di autenticazione
+  if (token && !isAuthRoute) {
     req = req.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`
@@ -20,9 +25,6 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error) => {
-      // Non gestire 401 sulle rotte di autenticazione (login/register)
-      const isAuthRoute = req.url.includes('/auth/login') || req.url.includes('/auth/register');
-      
       // Se riceve 401 Unauthorized su rotte protette, effettua il logout
       if (error.status === 401 && !isAuthRoute) {
         authService.logout();
