@@ -1,0 +1,54 @@
+<div class="property-list-container">
+  <div class="header">
+    <h1>Case Disponibili</h1>
+    <p>Trova la casa perfetta per il tuo soggiorno</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Caricamento case disponibili...</p>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+    <button (click)="loadProperties()" class="retry-btn">Riprova</button>
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && properties.length === 0" class="no-properties">
+    <p>Nessuna casa disponibile al momento.</p>
+  </div>
+
+  <div *ngIf="!loading && properties.length > 0" class="properties-grid">
+    <div *ngFor="let property of properties" class="property-card" (click)="viewPropertyDetails(property.id)">
+      <div class="property-image">
+        <img [src]="property.imageUrl || 'assets/images/default-property.jpg'" [alt]="property.title">
+      </div>
+      <div class="property-content">
+        <h3>{{ property.title }}</h3>
+        <p class="location">
+          <i class="icon-location"></i>
+          {{ property.city }}, {{ property.country }}
+        </p>
+        <p class="description">{{ property.description }}</p>
+        <div class="property-details">
+          <span class="detail">
+            <i class="icon-bed"></i>
+            {{ property.bedrooms }} camere
+          </span>
+          <span class="detail">
+            <i class="icon-bath"></i>
+            {{ property.bathrooms }} bagni
+          </span>
+          <span class="detail">
+            <i class="icon-guests"></i>
+            {{ property.maxGuests }} ospiti
+          </span>
+        </div>
+        <div class="property-footer">
+          <span class="price">€{{ property.pricePerNight }}<span class="per-night">/notte</span></span>
+          <button class="view-btn">Vedi dettagli</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

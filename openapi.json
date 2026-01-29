@@ -1,0 +1,598 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "OpenAPI definition",
+    "version": "v0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Generated server url"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Prenotazioni",
+      "description": "API per la gestione delle prenotazioni delle case vacanza"
+    },
+    {
+      "name": "Test Scopes",
+      "description": "Endpoint didattico per capire la differenza tra Singleton e Prototype"
+    },
+    {
+      "name": "Autenticazione",
+      "description": "Endpoint per la gestione di Accesso e Registrazione"
+    }
+  ],
+  "paths": {
+    "/api/prenotazioni": {
+      "post": {
+        "tags": [
+          "Prenotazioni"
+        ],
+        "summary": "Crea una nuova prenotazione",
+        "description": "Verifica la disponibilità della casa e salva la prenotazione nel database.",
+        "operationId": "crea",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PrenotazioneRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "400": {
+            "description": "Dati di input non validi o date incoerenti",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrenotazioneResponseDTO"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Prenotazione creata con successo",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrenotazioneResponseDTO"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Casa vacanza non trovata",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PrenotazioneResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/case": {
+      "post": {
+        "tags": [
+          "casavacanza-controller"
+        ],
+        "operationId": "crea_1",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CasavacanzaRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CasavacanzaResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Autenticazione"
+        ],
+        "operationId": "register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Autenticazione"
+        ],
+        "operationId": "authenticate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationRequestDTO"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/test/prototype": {
+      "get": {
+        "tags": [
+          "Test Scopes"
+        ],
+        "summary": "Test del Bean Scope",
+        "description": "Recupera due istanze di CounterService dal contesto. Se il Bean è Prototype, C2 sarà 0. Se è Singleton, C2 sarà 1.",
+        "operationId": "test",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prenotazioni/utente/{utenteId}": {
+      "get": {
+        "tags": [
+          "Prenotazioni"
+        ],
+        "summary": "Recupera le prenotazioni di un utente",
+        "description": "Restituisce una pagina di prenotazioni filtrate per l'ID utente. Supporta la paginazione (page, size) e l'ordinamento (sort).",
+        "operationId": "getByUtente",
+        "parameters": [
+          {
+            "name": "utenteId",
+            "in": "path",
+            "description": "ID univoco dell'utente",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Zero-based page index (0..N)",
+            "required": false,
+            "schema": {
+              "minimum": 0,
+              "type": "integer",
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "in": "query",
+            "description": "The size of the page to be returned",
+            "required": false,
+            "schema": {
+              "minimum": 1,
+              "type": "integer",
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagePrenotazioneResponseDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prenotazioni/utente/{utenteId}/all": {
+      "get": {
+        "tags": [
+          "Prenotazioni"
+        ],
+        "summary": "Recupera TUTTE le prenotazioni (PERICOLOSO)",
+        "description": "Rischioso: carica TUTTO in memoria. Se l'utente ha 1 milione di prenotazioni, l'app crasha (OutOfMemory).",
+        "operationId": "getByUtenteSenzaPaginazione",
+        "parameters": [
+          {
+            "name": "utenteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PrenotazioneResponseDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/case/disponibili": {
+      "get": {
+        "tags": [
+          "casavacanza-controller"
+        ],
+        "operationId": "cercaDisponibili",
+        "parameters": [
+          {
+            "name": "inizio",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "fine",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "citta",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CasavacanzaResponseDTO"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PrenotazioneRequestDTO": {
+        "required": [
+          "casaId",
+          "dataFine"
+        ],
+        "type": "object",
+        "properties": {
+          "casaId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dataInizio": {
+            "type": "string",
+            "format": "date"
+          },
+          "dataFine": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      },
+      "PrenotazioneResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "dataInizio": {
+            "type": "string",
+            "format": "date"
+          },
+          "dataFine": {
+            "type": "string",
+            "format": "date"
+          },
+          "nomeCasa": {
+            "type": "string"
+          },
+          "casaId": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "CasavacanzaRequestDTO": {
+        "type": "object",
+        "properties": {
+          "nome": {
+            "type": "string"
+          },
+          "indirizzo": {
+            "type": "string"
+          },
+          "prezzoNotte": {
+            "type": "number",
+            "format": "double"
+          },
+          "citta": {
+            "type": "string"
+          }
+        }
+      },
+      "CasavacanzaResponseDTO": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "indirizzo": {
+            "type": "string"
+          },
+          "prezzoNotte": {
+            "type": "number",
+            "format": "double"
+          },
+          "citta": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequestDTO": {
+        "required": [
+          "email",
+          "nome",
+          "password",
+          "ruolo"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "maxLength": 2147483647,
+            "minLength": 6,
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          },
+          "ruolo": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ]
+          }
+        }
+      },
+      "RegisterResponseDTO": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "nome": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthenticationRequestDTO": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthenticationResponseDTO": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "PagePrenotazioneResponseDTO": {
+        "type": "object",
+        "properties": {
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "content": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PrenotazioneResponseDTO"
+            }
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "first": {
+            "type": "boolean"
+          },
+          "last": {
+            "type": "boolean"
+          },
+          "numberOfElements": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageable": {
+            "$ref": "#/components/schemas/PageableObject"
+          },
+          "empty": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PageableObject": {
+        "type": "object",
+        "properties": {
+          "offset": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sort": {
+            "$ref": "#/components/schemas/SortObject"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "paged": {
+            "type": "boolean"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "unpaged": {
+            "type": "boolean"
+          }
+        }
+      },
+      "SortObject": {
+        "type": "object",
+        "properties": {
+          "empty": {
+            "type": "boolean"
+          },
+          "sorted": {
+            "type": "boolean"
+          },
+          "unsorted": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "name": "bearerAuth",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

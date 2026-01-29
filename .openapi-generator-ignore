@@ -1,0 +1,7 @@
+# OpenAPI Generator Ignore
+# Files to ignore during generation
+
+# Prevent overwriting custom modifications
+README.md
+git_push.sh
+.gitignore
