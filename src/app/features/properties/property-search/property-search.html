@@ -1,30 +1,105 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Property Search</title>
-</head>
-<body>
-    <header>
-        <h1>Property Search</h1>
-    </header>
-    <main>
-        <section>
-            <form id="search-form">
-                <label for="location">Location:</label>
-                <input type="text" id="location" name="location" required>
-                <label for="price-range">Price Range:</label>
-                <input type="text" id="price-range" name="price-range">
-                <button type="submit">Search</button>
-            </form>
-        </section>
-        <section id="search-results">
-            <!-- Results will be displayed here -->
-        </section>
-    </main>
-    <footer>
-        <p>&copy; 2026 EasyStay</p>
-    </footer>
-</body>
-</html>
+<div class="search-container">
+  <div class="search-header">
+    <div class="welcome-section">
+      <h1>🏠 EasyStay</h1>
+      @if (currentUser) {
+        <p class="welcome-message">Benvenuto, <strong>{{ currentUser.nome }}</strong>!</p>
+      }
+    </div>
+    <button class="btn-logout" (click)="logout()">Logout</button>
+  </div>
+
+  <div class="search-card">
+    <h2>Cerca la tua casa vacanza</h2>
+    <p class="subtitle">Compila il form per visualizzare le case disponibili</p>
+    
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="dataInizio">Data Inizio</label>
+          <input 
+            type="date" 
+            id="dataInizio" 
+            formControlName="dataInizio"
+            [class.invalid]="dataInizio?.invalid && dataInizio?.touched"
+          />
+          @if (dataInizio?.invalid && dataInizio?.touched) {
+            <span class="error-message">Data inizio obbligatoria</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="dataFine">Data Fine</label>
+          <input 
+            type="date" 
+            id="dataFine" 
+            formControlName="dataFine"
+            [class.invalid]="dataFine?.invalid && dataFine?.touched"
+          />
+          @if (dataFine?.invalid && dataFine?.touched) {
+            <span class="error-message">Data fine obbligatoria</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="citta">Città</label>
+          <input 
+            type="text" 
+            id="citta" 
+            formControlName="citta"
+            [class.invalid]="citta?.invalid && citta?.touched"
+            placeholder="Es: Roma, Milano, Napoli"
+          />
+          @if (citta?.invalid && citta?.touched) {
+            <span class="error-message">Città obbligatoria</span>
+          }
+        </div>
+      </div>
+
+      @if (errorMessage) {
+        <div class="alert alert-error">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button 
+        type="submit" 
+        [disabled]="searchForm.invalid || loading"
+        class="btn-primary"
+      >
+        @if (loading) {
+          🔍 Ricerca in corso...
+        } @else {
+          🔍 Cerca Case
+        }
+      </button>
+    </form>
+  </div>
+
+  @if (searched) {
+    <div class="results-section">
+      <h3>Risultati della ricerca</h3>
+      
+      @if (loading) {
+        <div class="loading-spinner">
+          <p>Caricamento...</p>
+        </div>
+      } @else if (properties.length === 0) {
+        <div class="no-results">
+          <p>😔 Nessuna casa disponibile per le date e la città selezionate.</p>
+        </div>
+      } @else {
+        <div class="properties-grid">
+          @for (property of properties; track property.id) {
+            <div class="property-card">
+              <h4>{{ property.nome }}</h4>
+              <p class="address">📍 {{ property.indirizzo }}, {{ property.citta }}</p>
+              <p class="price">💰 {{ property.prezzoNotte }}€ / notte</p>
+              <button class="btn-book">Prenota</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
