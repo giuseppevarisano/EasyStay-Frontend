@@ -1,15 +1,26 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { environment } from '../../../environments/environment';
-import { User, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from '../models/user.model';
+import { AutenticazioneService } from '../api/generated';
+import { 
+  AuthenticationRequestDTO, 
+  AuthenticationResponseDTO,
+  RegisterRequestDTO,
+  RegisterResponseDTO
+} from '../api/generated/model/models';
+
+// Interfaccia per l'utente corrente
+export interface User {
+  email: string;
+  nome: string;
+  ruolo: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private http = inject(HttpClient);
+  private autenticazioneService = inject(AutenticazioneService);
   private router = inject(Router);
   
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
@@ -20,15 +31,15 @@ export class AuthService {
 
   constructor() {}
 
-  login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
+  login(credentials: AuthenticationRequestDTO): Observable<AuthenticationResponseDTO> {
+    return this.autenticazioneService.authenticate({ authenticationRequestDTO: credentials })
       .pipe(
         tap(response => this.handleLoginResponse(response))
       );
   }
 
-  register(userData: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${environment.apiUrl}/auth/register`, userData)
+  register(userData: RegisterRequestDTO): Observable<RegisterResponseDTO> {
+    return this.autenticazioneService.register({ registerRequestDTO: userData })
       .pipe(
         tap(response => this.handleRegisterResponse(response))
       );
@@ -53,20 +64,25 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  private handleLoginResponse(response: LoginResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    // Il login ritorna solo il token, non i dati utente
+  private handleLoginResponse(response: AuthenticationResponseDTO): void {
+    if (response.token) {
+      localStorage.setItem(this.TOKEN_KEY, response.token);
+    }
   }
 
-  private handleRegisterResponse(response: RegisterResponse): void {
-    localStorage.setItem(this.TOKEN_KEY, response.token);
-    const user: User = {
-      email: response.email,
-      nome: response.nome,
-      ruolo: 'USER' // Default ruolo
-    };
-    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
-    this.currentUserSubject.next(user);
+  private handleRegisterResponse(response: RegisterResponseDTO): void {
+    if (response.token) {
+      localStorage.setItem(this.TOKEN_KEY, response.token);
+    }
+    if (response.email && response.nome) {
+      const user: User = {
+        email: response.email,
+        nome: response.nome,
+        ruolo: 'USER'
+      };
+      localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+      this.currentUserSubject.next(user);
+    }
   }
 
   private getUserFromStorage(): User | null {

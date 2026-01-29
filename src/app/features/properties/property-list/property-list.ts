@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { PropertyService } from '../../../core/services/property';
-import { Property } from '../../../core/models/property.model';
+import { CasavacanzaResponseDTO } from '../../../core/api/generated/model/models';
 
 @Component({
   selector: 'app-property-list',
@@ -14,7 +14,7 @@ export class PropertyList implements OnInit {
   private propertyService = inject(PropertyService);
   private router = inject(Router);
 
-  properties: Property[] = [];
+  properties: CasavacanzaResponseDTO[] = [];
   loading = false;
   errorMessage = '';
 
@@ -26,7 +26,16 @@ export class PropertyList implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.propertyService.getProperties().subscribe({
+    // Per ora cerchiamo case a Roma nelle prossime date
+    // In futuro questo dovrebbe venire da un form di ricerca
+    const oggi = new Date();
+    const domani = new Date(oggi);
+    domani.setDate(domani.getDate() + 1);
+    
+    const inizio = oggi.toISOString().split('T')[0]; // formato YYYY-MM-DD
+    const fine = domani.toISOString().split('T')[0];
+
+    this.propertyService.getAvailableProperties(inizio, fine, 'Roma').subscribe({
       next: (properties) => {
         this.properties = properties;
         this.loading = false;

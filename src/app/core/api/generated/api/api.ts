@@ -1,0 +1,13 @@
+export * from './autenticazione.service';
+import { AutenticazioneService } from './autenticazione.service';
+export * from './autenticazione.serviceInterface';
+export * from './casavacanzaController.service';
+import { CasavacanzaControllerService } from './casavacanzaController.service';
+export * from './casavacanzaController.serviceInterface';
+export * from './prenotazioni.service';
+import { PrenotazioniService } from './prenotazioni.service';
+export * from './prenotazioni.serviceInterface';
+export * from './testScopes.service';
+import { TestScopesService } from './testScopes.service';
+export * from './testScopes.serviceInterface';
+export const APIS = [AutenticazioneService, CasavacanzaControllerService, PrenotazioniService, TestScopesService];
