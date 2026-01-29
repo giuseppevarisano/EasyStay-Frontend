@@ -13,7 +13,7 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: '/properties',
+    redirectTo: '/auth/login',  // ← Cambia qui da '/properties' a '/auth/login'
     pathMatch: 'full'
   }
 ];
