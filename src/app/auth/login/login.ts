@@ -35,13 +35,13 @@ export class Login {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/properties';
+          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/search';
           this.router.navigate([returnUrl]);
         },
         error: (error) => {
           console.error('Login error:', error);
           console.error('Error structure:', JSON.stringify(error, null, 2));
-          
+
           // Il backend ritorna il messaggio direttamente in error.error.message
           this.errorMessage = error?.error?.message || error?.message || 'Errore durante il login. Verifica le credenziali.';
           console.log('errorMessage impostato a:', this.errorMessage);
