@@ -38,18 +38,29 @@ export class Login {
           const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/search';
           this.router.navigate([returnUrl]);
         },
-        error: (error) => {
+        error: async (error) => {
           console.error('Login error:', error);
-          console.error('Error structure:', JSON.stringify(error, null, 2));
 
-          // Il backend ritorna il messaggio direttamente in error.error.message
-          this.errorMessage = error?.error?.message || error?.message || 'Errore durante il login. Verifica le credenziali.';
-          console.log('errorMessage impostato a:', this.errorMessage);
+          let message = 'Errore durante il login. Verifica le credenziali.';
+
+          // Se l'errore è un Blob, leggilo manualmente
+          if (error.error instanceof Blob) {
+            try {
+              const text = await error.error.text();
+              const errorObj = JSON.parse(text);
+              message = errorObj.message || message;
+            } catch (e) {
+              console.error('Errore nel parsing del Blob:', e);
+            }
+          } else if (error.error?.message) {
+            message = error.error.message;
+          }
+
+          this.errorMessage = message;
           this.loading = false;
-          this.cdr.detectChanges(); // Forza il change detection
+          this.cdr.detectChanges();
         },
         complete: () => {
-          // Assicuriamoci che loading venga sempre resettato
           this.loading = false;
         }
       });
