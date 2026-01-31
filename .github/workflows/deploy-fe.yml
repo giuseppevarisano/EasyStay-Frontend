@@ -1,0 +1,50 @@
+name: EasyStay Frontend CI/CD
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    # Questo permette alla pipeline di scrivere nel registro dei pacchetti di GitHub
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout del codice
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Installazione dipendenze
+        run: npm install
+
+      # - name: Esecuzione Test
+      #   run: npm test -- --watch=false --browsers=ChromeHeadless
+      #   # Nota: Decommenta sopra se hai configurato Karma/Jasmine per i test
+
+      - name: Login al GitHub Container Registry (GHCR)
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build e Push Immagine Docker
+        if: github.event_name != 'pull_request'
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # Nota: l'immagine si chiamerà easystay-frontend
+          tags: ghcr.io/${{ github.actor }}/easystay-frontend:latest
