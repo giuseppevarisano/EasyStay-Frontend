@@ -35,15 +35,26 @@ export class Login {
 
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/search';
-          this.router.navigate([returnUrl]);
+          console.log('==================== DEBUG ====================');
+          console.log('LocalStorage PRIMA del setTimeout:');
+          console.log('  - auth_token:', localStorage.getItem('auth_token'));
+          console.log('  - Tutte le chiavi:', Object.keys(localStorage));
+
+          // Aspetta che il token sia salvato prima di navigare
+          setTimeout(() => {
+            console.log('LocalStorage DOPO il setTimeout:');
+            console.log('  - auth_token:', localStorage.getItem('auth_token'));
+
+            const returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/search';
+            this.router.navigate([returnUrl]);
+          }, 100);
         },
         error: async (error) => {
           console.error('Login error:', error);
 
           let message = 'Errore durante il login. Verifica le credenziali.';
 
-          // Se l'errore è un Blob, leggilo manualmente
+          // Gestisci la risposta Blob dal backend
           if (error.error instanceof Blob) {
             try {
               const text = await error.error.text();

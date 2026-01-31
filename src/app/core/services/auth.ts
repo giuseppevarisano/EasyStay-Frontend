@@ -1,9 +1,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
+import { BehaviorSubject, Observable, map, tap } from 'rxjs';
 import { AutenticazioneService } from '../api/generated';
-import { 
-  AuthenticationRequestDTO, 
+import {
+  AuthenticationRequestDTO,
   AuthenticationResponseDTO,
   RegisterRequestDTO,
   RegisterResponseDTO
@@ -22,19 +23,23 @@ export interface User {
 export class AuthService {
   private autenticazioneService = inject(AutenticazioneService);
   private router = inject(Router);
-  
+
   private currentUserSubject = new BehaviorSubject<User | null>(this.getUserFromStorage());
   public currentUser$ = this.currentUserSubject.asObservable();
-  
+
   private readonly TOKEN_KEY = 'auth_token';
   private readonly USER_KEY = 'current_user';
 
   constructor() {}
 
   login(credentials: AuthenticationRequestDTO): Observable<AuthenticationResponseDTO> {
-    return this.autenticazioneService.authenticate({ authenticationRequestDTO: credentials })
+    return this.autenticazioneService.authenticate(
+      { authenticationRequestDTO: credentials },
+      'response'
+    )
       .pipe(
-        tap(response => this.handleLoginResponse(response))
+        tap((response: HttpResponse<AuthenticationResponseDTO>) => this.handleLoginHttpResponse(response)),
+        map((response: HttpResponse<AuthenticationResponseDTO>) => response.body ?? {})
       );
   }
 
@@ -64,9 +69,22 @@ export class AuthService {
     return !!this.getToken();
   }
 
-  private handleLoginResponse(response: AuthenticationResponseDTO): void {
-    if (response.token) {
-      localStorage.setItem(this.TOKEN_KEY, response.token);
+  private handleLoginHttpResponse(response: HttpResponse<AuthenticationResponseDTO>): void {
+    let token = response.body?.token;
+
+    if (!token) {
+      const authorization = response.headers.get('Authorization') || response.headers.get('authorization');
+      if (authorization) {
+        token = authorization.startsWith('Bearer ') ? authorization.slice(7) : authorization;
+      }
+    }
+
+    if (!token) {
+      token = response.headers.get('X-Auth-Token') || response.headers.get('x-auth-token') || undefined;
+    }
+
+    if (token) {
+      localStorage.setItem(this.TOKEN_KEY, token);
     }
   }
 
