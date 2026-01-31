@@ -1,31 +1,31 @@
-FROM ubuntu:latest
-LABEL authors="GiuseppeVarisano"
-
-ENTRYPOINT ["top", "-b"]
-
-# Stage 1: Compilazione (Build)
+# Stage 1: Build
 FROM node:18-alpine AS build
 WORKDIR /app
 
-# Copiamo i file dei pacchetti per installare le dipendenze
+# Installiamo le dipendenze
 COPY package*.json ./
 RUN npm install
 
-# Copiamo tutto il resto del codice e compiliamo
+# Copiamo il resto dei file
 COPY . .
-RUN npm run build --configuration=production
 
-# Stage 2: Server Web (Nginx) per servire l'app
+# --- PASSAGGIO CHIAVE ---
+# Se la tua build dipende dai file generati da OpenAPI, lanciamo il generatore
+# Se non serve o fallisce perché manca il file openapi.json, puoi commentare questa riga
+RUN npm run generate:api || echo "Generazione API saltata o non necessaria"
+
+# Eseguiamo la build (usando npx per essere sicuri)
+RUN npx ng build
+# -----------------------
+
+# Stage 2: Serve
 FROM nginx:stable-alpine
-
-# Rimuoviamo i file di default di Nginx
 RUN rm -rf /usr/share/nginx/html/*
 
-# COPIA I FILE: Qui devi fare attenzione al nome della cartella in dist/
-# Di solito è dist/<nome-progetto>/browser o semplicemente dist/<nome-progetto>
-COPY --from=build /app/dist/easy-stay/browser /usr/share/nginx/html
+# ATTENZIONE AL PERCORSO:
+# Con Angular 18+, la cartella di output è spesso dist/easystay-app/browser
+COPY --from=build /app/dist/easystay-app/browser /usr/share/nginx/html
 
-# Copiamo la configurazione custom di Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
