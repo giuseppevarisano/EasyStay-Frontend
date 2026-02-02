@@ -28,6 +28,9 @@ jobs:
       - name: Installazione dipendenze
         run: npm install
 
+      - name: Esecuzione Test e Controllo Coverage
+        run: npm run test:coverage
+
       # - name: Esecuzione Test
       #   run: npm test -- --watch=false --browsers=ChromeHeadless
       #   # Nota: Decommenta sopra se hai configurato Karma/Jasmine per i test
